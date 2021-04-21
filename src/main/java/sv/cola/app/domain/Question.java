@@ -23,22 +23,22 @@ public class Question {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
-	Long id;
+	private Long id;
     
     @Column(name = "txt", nullable = false)
-	String txt;
+    private String txt;
     
     @Column(name = "option_a", nullable = false)
-	String optionA;
+    private String optionA;
 	
     @Column(name = "option_b", nullable = false)
-    String optionB;
+    private String optionB;
 	
     @Column(name = "option_c", nullable = false)
-    String optionC;
+    private String optionC;
 	
     @Column(name = "option_d", nullable = false)
-    String optionD;
+    private String optionD;
 
 	public Long getId() {
 		return id;

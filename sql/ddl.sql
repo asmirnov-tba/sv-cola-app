@@ -2,11 +2,12 @@ create user app with password 'sv100500';
 
 create schema game;
 
-
 create table game.spot(
 	id serial primary key,
 	lat double precision,
-	lon double precision
+	lon double precision,
+	hint varchar(6000),
+	render_id int
 );
 
 create table game.question(
@@ -17,7 +18,7 @@ create table game.question(
 	option_c varchar(6000),
 	option_d varchar(6000),
 	correct_answer char(1)
-);
+);, hint
 
 
 create table game.play(
@@ -50,6 +51,8 @@ group by
 	pp.play_ptr
 order by distance_to_finish, last_answer_ts
 limit 1;
+
+grant all on schema game to app;
 
 grant all on game.play to app;
 grant all on game.play_point to app;

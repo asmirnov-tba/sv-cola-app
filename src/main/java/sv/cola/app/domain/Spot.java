@@ -32,6 +32,20 @@ public class Spot {
 	
     @Column(name = "lon", nullable = false)
 	private Double lon;
+    
+    @Column(name = "hint", nullable = false)
+	private String hint;
+    
+    @Column(name = "render_id", nullable = false)
+	private Integer renderId;
+
+	public Integer getRenderId() {
+		return renderId;
+	}
+
+	public void setRenderId(Integer renderId) {
+		this.renderId = renderId;
+	}
 
 	public Long getId() {
 		return id;
@@ -55,6 +69,14 @@ public class Spot {
 
 	public void setLon(Double lon) {
 		this.lon = lon;
+	}
+
+	public String getHint() {
+		return hint;
+	}
+
+	public void setHint(String hint) {
+		this.hint = hint;
 	}
 
 }

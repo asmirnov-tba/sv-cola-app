@@ -136,25 +136,7 @@ public class AppController {
 		return currentPlayPoint;
 		
 	}
-	
-//	@GetMapping("/current_point")
-//	public Spot currentPoint(@RequestParam String deviceId) throws ResponseStatusException {
-//		PlayPoint playPoint = getCurrentPlayPointByDeviceId(deviceId);
-//		if (playPoint == null) {
-//			return null;
-//		}
-//		return spotRepository.getOne(playPoint.getPointPtr());
-//	}
-//	
-//	@GetMapping("/current_question")
-//	public Question currentQuestion(@RequestParam String deviceId) throws ResponseStatusException {
-//		PlayPoint playPoint = getCurrentPlayPointByDeviceId(deviceId);
-//		if (playPoint == null) {
-//			return null;
-//		}
-//		return questionRepository.getOne(playPoint.getQuestionPtr());
-//	}
-	
+
 	@GetMapping("/answer")
 	public Response answer(@RequestParam String deviceId, @RequestParam String answer) throws ResponseStatusException {
 		PlayPoint playPoint = getCurrentPlayPointByDeviceId(deviceId);
@@ -177,17 +159,22 @@ public class AppController {
 	@GetMapping("/status")
 	public PlayerStatus status(@RequestParam String deviceId) throws ResponseStatusException {
 			
-			Play p = getPlayByDeviceId(deviceId);
+			PlayerStatus result = new PlayerStatus();
 		
-			PlayerStatus.GameStatus gameStatus = GameStatus.GameInProgress;
+			Play p = getPlayByDeviceId(deviceId);
+			
+			result.setRegistrationTS(p.getRegistrationTS());
+			
+			result.setPlayerStatus(GameStatus.GameInProgress);
+		
 			List<Leader> leaders = leaderRepository.findAll();
 			if(leaders.size() > 0) {
 				Leader leader = leaders.get(0);
 				if(leader.getDistanceToFinish() == 0) {
 					if(leader.getPlayPtr() == p.getId()) {
-						gameStatus = GameStatus.Winner;
+						result.setPlayerStatus(GameStatus.Winner);
 					} else {
-						gameStatus = GameStatus.Loser;
+						result.setPlayerStatus(GameStatus.Loser);
 					}
 				}
 			}
@@ -195,12 +182,13 @@ public class AppController {
 			PlayPoint pp = new PlayPoint();
 			
 			pp.setPlayPtr(p.getId());
-			
 			List<PlayPoint> playPoints = playPointRepository.findAll(Example.of(pp));
 			
 			if(playPoints.size() == 0) {
 				return null; // need throw error
 			}
+			
+			result.setTotalPoints(playPoints.size());
 			
 			PlayPoint currentPlayPoint = playPoints
 					.stream()
@@ -213,15 +201,27 @@ public class AppController {
 					.filter(playPoint -> playPoint.getStatus() == 1)
 					.count()).intValue();
 			
-			Spot curentPoint = null;
-			Question currentQuestion = null;
+			result.setPointsPassed(pointsPassed);
 			
 			if(currentPlayPoint != null){
-				curentPoint = spotRepository.getOne(currentPlayPoint.getPointPtr());
-				currentQuestion = questionRepository.getOne(currentPlayPoint.getQuestionPtr());
+				Spot currentPoint = spotRepository.getOne(currentPlayPoint.getPointPtr());
+				
+				result.setCurrentPointLat(currentPoint.getLat());
+				result.setCurrentPointLon(currentPoint.getLon());
+				result.setCurrentPointHint(currentPoint.getHint());
+				result.setCurrentPointRenderId(currentPoint.getRenderId());
+				
+				Question currentQuestion = questionRepository.getOne(currentPlayPoint.getQuestionPtr());
+				
+				result.setCurrentQuestionTxt(currentQuestion.getTxt());
+				result.setCurrentQuestionOptionA(currentQuestion.getOptionA());
+				result.setCurrentQuestionOptionB(currentQuestion.getOptionB());
+				result.setCurrentQuestionOptionC(currentQuestion.getOptionC());
+				result.setCurrentQuestionOptionD(currentQuestion.getOptionD());
 			}
+
+			return result;
 			
-			return new PlayerStatus(gameStatus, playPoints.size(), pointsPassed, curentPoint, currentQuestion, p.getRegistrationTS());
 	}
 		
 }
