@@ -1,4 +1,4 @@
-package sv.cola.app.domain;
+package sv.cola.app.domain.db;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -32,6 +32,19 @@ public class Play {
     @Column(name = "registration_ts", nullable = true)
 	Long registrationTS;
     
+    @Column(name = "points_planned", nullable = true)
+	Integer pointsPlanned;
+    
+    
+
+	public Integer getPointsPlanned() {
+		return pointsPlanned;
+	}
+
+	public void setPointsPlanned(Integer pointsPlanned) {
+		this.pointsPlanned = pointsPlanned;
+	}
+
 	public Long getRegistrationTS() {
 		return registrationTS;
 	}

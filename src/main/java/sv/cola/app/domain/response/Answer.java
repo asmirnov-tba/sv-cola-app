@@ -1,9 +1,9 @@
-package sv.cola.app.domain;
+package sv.cola.app.domain.response;
 
-public class Response {
+public class Answer {
 	
-	public static final Response CORRECT_ANSWER = new Response(Status.CORRECT);
-	public static final Response INCORRECT_ANSWER = new Response(Status.INCORRECT);
+	public static final Answer CORRECT_ANSWER = new Answer(Status.CORRECT);
+	public static final Answer INCORRECT_ANSWER = new Answer(Status.INCORRECT);
 	
 	
 	public enum Status{
@@ -21,7 +21,7 @@ public class Response {
 		this.status = status;
 	}
 
-	public Response(Status status) {
+	public Answer(Status status) {
 		super();
 		this.status = status;
 	}

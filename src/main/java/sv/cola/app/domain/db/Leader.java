@@ -1,4 +1,4 @@
-package sv.cola.app.domain;
+package sv.cola.app.domain.db;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;

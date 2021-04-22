@@ -14,16 +14,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-import sv.cola.app.domain.Answer;
-import sv.cola.app.domain.Leader;
-import sv.cola.app.domain.Play;
-import sv.cola.app.domain.PlayPoint;
-import sv.cola.app.domain.PlayerStatus;
-import sv.cola.app.domain.PlayerStatus.GameStatus;
-import sv.cola.app.domain.Question;
-import sv.cola.app.domain.Response;
-import sv.cola.app.domain.Spot;
-import sv.cola.app.jpa.AnswerRepository;
+import sv.cola.app.domain.db.Leader;
+import sv.cola.app.domain.db.Play;
+import sv.cola.app.domain.db.PlayPoint;
+import sv.cola.app.domain.db.Question;
+import sv.cola.app.domain.db.Spot;
+import sv.cola.app.domain.response.PlayerStatus;
+import sv.cola.app.domain.response.PlayerStatus.GameStatus;
+import sv.cola.app.domain.response.Answer;
 import sv.cola.app.jpa.LeaderRepository;
 import sv.cola.app.jpa.PlayPointRepository;
 import sv.cola.app.jpa.PlayRepository;
@@ -34,9 +32,6 @@ import sv.cola.app.jpa.SpotRepository;
 @RequestMapping("/api/v1")
 public class AppController {
 	
-	
-	private static final int SPOTS_NUMBER = 3;
-	
 	@Autowired
 	private PlayRepository playRepository;
 	@Autowired
@@ -45,8 +40,6 @@ public class AppController {
 	private QuestionRepository questionRepository;
 	@Autowired
 	private SpotRepository spotRepository;
-	@Autowired
-	private AnswerRepository answerRepository;
 	@Autowired
 	private LeaderRepository leaderRepository;
 	
@@ -87,7 +80,7 @@ public class AppController {
 		Collections.shuffle(questions);
 		Collections.shuffle(spots);
 		
-		for(int i = 0; i<SPOTS_NUMBER; i++) {
+		for(int i = 0; i<play.getPointsPlanned(); i++) {
 			PlayPoint pp = new PlayPoint();
 			pp.setNum(i);
 			pp.setPlayPtr(play.getId());
@@ -138,21 +131,21 @@ public class AppController {
 	}
 
 	@GetMapping("/answer")
-	public Response answer(@RequestParam String deviceId, @RequestParam String answer) throws ResponseStatusException {
+	public Answer answer(@RequestParam String deviceId, @RequestParam String answer) throws ResponseStatusException {
 		PlayPoint playPoint = getCurrentPlayPointByDeviceId(deviceId);
 		if (playPoint == null) {
 			return null;
 		}
 		
-		Answer correctAnswer = answerRepository.getOne(playPoint.getQuestionPtr());
+		Question correctAnswer = questionRepository.getOne(playPoint.getQuestionPtr());
 		
 		if(answer.equals(correctAnswer.getCorrectAnswer())) {
 			playPoint.setStatus(1);
 			playPoint.setAnswerTS(System.currentTimeMillis());
 			playPointRepository.save(playPoint);
-			return Response.CORRECT_ANSWER;
+			return Answer.CORRECT_ANSWER;
 		} else {
-			return Response.INCORRECT_ANSWER;
+			return Answer.INCORRECT_ANSWER;
 		}
 	}
 	

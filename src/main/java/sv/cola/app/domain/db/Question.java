@@ -1,4 +1,4 @@
-package sv.cola.app.domain;
+package sv.cola.app.domain.db;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +40,21 @@ public class Question {
     @Column(name = "option_d", nullable = false)
     private String optionD;
 
+    @Column(name = "correct_answer", nullable = false)
+    String correctAnswer;
+
+
+
+	
+	public String getCorrectAnswer() {
+		return correctAnswer;
+	}
+
+	public void setCorrectAnswer(String correctAnswer) {
+		this.correctAnswer = correctAnswer;
+	}
+    
+    
 	public Long getId() {
 		return id;
 	}

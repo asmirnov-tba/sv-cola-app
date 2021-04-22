@@ -1,4 +1,4 @@
-package sv.cola.app.domain;
+package sv.cola.app.domain.response;
 
 public class PlayerStatus {
 	
