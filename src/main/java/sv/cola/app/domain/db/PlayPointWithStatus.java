@@ -8,17 +8,43 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Immutable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(schema = "game", name = "play_point")
+@Immutable
+@Table(schema = "game", name = "v_play_point_with_status")
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer", "handler", "created"})
-public class PlayPoint {
+public class PlayPointWithStatus {
 	
-    @Id
+    public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
+	public Long getAnswerTs() {
+		return answerTs;
+	}
+
+	public void setAnswerTs(Long answerTs) {
+		this.answerTs = answerTs;
+	}
+
+	public Integer getAttempt() {
+		return attempt;
+	}
+
+	public void setAttempt(Integer attempt) {
+		this.attempt = attempt;
+	}
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
 	Long id;
@@ -34,6 +60,15 @@ public class PlayPoint {
     
     @Column(name = "num", nullable = false)
     Integer num;
+    
+    @Column(name = "status", nullable = false)
+    Integer status;
+    
+    @Column(name = "answer_ts", nullable = true)
+    Long answerTs;
+    
+    @Column(name = "attempt", nullable = false)
+    Integer attempt;
 
 	public Long getId() {
 		return id;

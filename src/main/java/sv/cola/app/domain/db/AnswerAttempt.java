@@ -13,27 +13,26 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
-@Table(schema = "game", name = "play_point")
+@Table(schema = "game", name = "answer_attempts")
 @EntityListeners(AuditingEntityListener.class)
 @JsonIgnoreProperties(ignoreUnknown = true, value = {"hibernateLazyInitializer", "handler", "created"})
-public class PlayPoint {
+
+public class AnswerAttempt {
+
 	
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "serial")
 	Long id;
     
-    @Column(name = "play_ptr", nullable = false)
-	Long playPtr;
-	
-    @Column(name = "point_ptr", nullable = false)
-    Long pointPtr;
+    @Column(name = "play_point_ptr", nullable = false)
+    Integer playPointPtr;
     
-    @Column(name = "question_ptr", nullable = false)
-    Long questionPtr;
+    @Column(name = "answer", nullable = false)
+    String answer;
     
-    @Column(name = "num", nullable = false)
-    Integer num;
+    @Column(name = "answer_ts", nullable = false)
+    Long answerTs;
 
 	public Long getId() {
 		return id;
@@ -43,37 +42,29 @@ public class PlayPoint {
 		this.id = id;
 	}
 
-	public Long getPlayPtr() {
-		return playPtr;
+	public Integer getPlayPointPtr() {
+		return playPointPtr;
 	}
 
-	public void setPlayPtr(Long playPtr) {
-		this.playPtr = playPtr;
+	public void setPlayPointPtr(Integer playPointPtr) {
+		this.playPointPtr = playPointPtr;
 	}
 
-	public Long getPointPtr() {
-		return pointPtr;
+	public String getAnswer() {
+		return answer;
 	}
 
-	public void setPointPtr(Long pointPtr) {
-		this.pointPtr = pointPtr;
+	public void setAnswer(String answer) {
+		this.answer = answer;
 	}
 
-	public Long getQuestionPtr() {
-		return questionPtr;
+	public Long getAnswerTs() {
+		return answerTs;
 	}
 
-	public void setQuestionPtr(Long questionPtr) {
-		this.questionPtr = questionPtr;
+	public void setAnswerTs(Long answerTs) {
+		this.answerTs = answerTs;
 	}
-
-	public Integer getNum() {
-		return num;
-	}
-
-	public void setNum(Integer num) {
-		this.num = num;
-	}
-
-
+    
+    
 }

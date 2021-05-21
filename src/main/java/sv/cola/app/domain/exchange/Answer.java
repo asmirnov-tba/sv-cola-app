@@ -1,14 +1,16 @@
-package sv.cola.app.domain.response;
+package sv.cola.app.domain.exchange;
 
 public class Answer {
 	
 	public static final Answer CORRECT_ANSWER = new Answer(Status.CORRECT);
 	public static final Answer INCORRECT_ANSWER = new Answer(Status.INCORRECT);
+	public static final Answer PENALTY_ANSWER = new Answer(Status.PENALTY);
 	
 	
 	public enum Status{
 		CORRECT,
-		INCORRECT;
+		INCORRECT,
+		PENALTY;
 	}
 	
 	private Status status;

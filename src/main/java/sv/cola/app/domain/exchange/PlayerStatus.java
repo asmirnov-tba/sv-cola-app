@@ -1,9 +1,11 @@
-package sv.cola.app.domain.response;
+package sv.cola.app.domain.exchange;
 
 public class PlayerStatus {
 	
 	public enum GameStatus {
+		GameNotStarted,
 		GameInProgress,
+		Penalty,
 		Winner,
 		Loser;
 	}
@@ -17,18 +19,7 @@ public class PlayerStatus {
 	private String currentPointHint;
 	private Integer currentPointRenderId;
 	
-	
-
-
-	public Integer getCurrentPointRenderId() {
-		return currentPointRenderId;
-	}
-
-	public void setCurrentPointRenderId(Integer currentPointRenderId) {
-		this.currentPointRenderId = currentPointRenderId;
-	}
-
-
+	private Integer currentPointId;
 
 	private String currentQuestionTxt;
     
@@ -87,6 +78,24 @@ public class PlayerStatus {
 		this.currentPointHint = currentPointHint;
 	}
 
+	
+	public Integer getCurrentPointId() {
+		return currentPointId;
+	}
+
+	public void setCurrentPointId(Integer pointId) {
+		this.currentPointId = pointId;
+	}
+
+	public Integer getCurrentPointRenderId() {
+		return currentPointRenderId;
+	}
+
+	public void setCurrentPointRenderId(Integer currentPointRenderId) {
+		this.currentPointRenderId = currentPointRenderId;
+	}
+
+	
 	public String getCurrentQuestionTxt() {
 		return currentQuestionTxt;
 	}

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <title>SVCola Superfinal!</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {font-family: Arial, Helvetica, sans-serif;}
+
+            /* The Modal (background) */
+            .question_modal {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                padding-top: 100px; /* Location of the box */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+            
+            .registration_modal {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                padding-top: 100px; /* Location of the box */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+            
+            .game_not_started_modal {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                padding-top: 100px; /* Location of the box */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+            
+            .endgame_modal {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                padding-top: 100px; /* Location of the box */
+                left: 0;
+                top: 0;
+                width: 100%; /* Full width */
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: rgb(0,0,0); /* Fallback color */
+                background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+            }
+
+            /* Modal Content */
+            .modal-content {
+                background-color: #fefefe;
+                margin: auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
+                align-items: center;
+            }
+
+            /* The Close Button */
+            .close {
+                color: #aaaaaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
+            }
+        </style>
+    </head>
+    <body>
+        
+        <div id="point_area">
+            <h2>Двигайтесь к следующей точке</h2>
+            <div id="point_hint"></div>
+            <button id="i_found_it_btn">Кажется я пришел</button>
+        </div>
+        
+
+        <!-- Trigger/Open The Modal -->
+
+        <!-- Question Modal -->
+        <div id="questionModal" class="question_modal">
+            <div class="modal-content">
+                <p id="question_txt">Question</p>
+                <button id="answer_A_btn">Answer1</button><br/>
+                <button id="answer_B_btn">Answer2</button><br/>
+                <button id="answer_C_btn">Answer3</button><br/>
+                <button id="answer_D_btn">Answer4</button>
+            </div>
+        </div>
+        
+        <!-- Registration Modal -->
+        <div id="registrationModal" class="registration_modal">
+            <div class="modal-content">
+                <input type="text" id="registration_input"/>
+                <button id="registration_button">Зарегистрироваться</button>
+            </div>
+        </div>
+        
+        <div id="endgameModal" class="endgame_modal">
+            <div class="modal-content">
+                <h2>Игра завершена</h2>
+                <div id="endgame_message"></div>
+            </div>
+        </div>
+        
+        <div id="gameNotStartedModal" class="game_not_started_modal">
+            <div class="modal-content">
+                <h2>Игра еще не началась...</h2>
+                <button id="game_not_started_btn">А теперь началась?</button>
+            </div>
+        </div>
+        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/js-cookie@rc/dist/js.cookie.min.js"></script>
+        <script>
+            
+            document.getElementById("point_area").style.display = "none";
+            
+            
+            
+            current_lat = null;
+            current_lon = null;
+            
+            function uuidv4() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                  var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                  return v.toString(16);
+                });
+              }
+            
+            function get_id(){
+                var id = Cookies.get('sv-cola-id');
+                if(id === undefined){
+                    id = uuidv4();
+                    Cookies.set('sv-cola-id', id, {domain: 'svcolasupergood.ru', expires: 60 });
+                }
+                return id;
+            }
+            
+            
+            //var deviceID = "dev1";
+          
+            
+            function get_status(){
+                
+                $.ajax({
+                        success: function (data, textStatus, jqXHR) {
+                        console.log(data);
+                        switch (data.playerStatus) {
+                            case "Penalty":
+                            case "GameInProgress":
+                                current_lat = data.currentPointLat;
+                                current_lon = data.currentPointLon;
+                                
+                                document.getElementById("point_hint").textContent = data.currentPointHint;
+                                document.getElementById("question_txt").textContent = data.currentQuestionTxt;
+                                document.getElementById("answer_A_btn").textContent = data.currentQuestionOptionA;
+                                document.getElementById("answer_B_btn").textContent = data.currentQuestionOptionB;
+                                document.getElementById("answer_C_btn").textContent = data.currentQuestionOptionC;
+                                document.getElementById("answer_D_btn").textContent = data.currentQuestionOptionD;
+                                
+                                document.getElementById("point_area").style.display = "inline";
+                                break;
+                            case "GameNotStarted":
+                                document.getElementById("gameNotStartedModal").style.display="block";
+                                break;
+                            case "Winner":
+                                document.getElementById("endgame_message").textContent="Вы победили";
+                                document.getElementById("endgameModal").style.display = "block";
+                                break;
+                            case "Loser":
+                                document.getElementById("endgame_message").textContent="Победил кто-то другой...";
+                                document.getElementById("endgameModal").style.display = "block";
+                                break;
+                            default:
+                                alert("Что-то пошло не так... Обратитесь в поддержку");
+                                break;
+                        }
+                    },
+                        type: "GET",
+                        headers: {},
+                        url: "https://svcolasupergood.ru:8443/api/v1/status?deviceId=" + get_id(),
+                        error: function (jqXHR, textStatus, errorThrown) {
+                            if(jqXHR.status === 401){
+                                document.getElementById("registrationModal").style.display = "block";
+                            }
+                    }
+                 });
+
+            }
+            
+            function registration(teamname, deviceId){
+                var ajaxResponse = $.ajax({
+                    async: false,
+                    type: 'GET',
+                    headers: {},
+                    url: "https://svcolasupergood.ru:8443/api/v1/registration?deviceId=" + get_id() + "&teamName=" + teamname
+                });
+                
+                switch (ajaxResponse.status) {
+                    case 401:
+                        return "UNAUTHORIZED";
+                    case 425:
+                        return "GAME_NOT_STARTED";
+                    case 408:
+                        return "GAME_ENDED";
+                    case 200:
+                        return "OK";
+                    default:
+                        return "UNKNOWN";
+                }
+            }
+            
+            function distance(lat1, lon1, lat2, lon2, unit) {
+                if ((lat1 === lat2) && (lon1 === lon2)) {
+                    return 0;
+                }
+                else {
+                    var radlat1 = Math.PI * lat1/180;
+                    var radlat2 = Math.PI * lat2/180;
+                    var theta = lon1-lon2;
+                    var radtheta = Math.PI * theta/180;
+                    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
+                    if (dist > 1) {
+                        dist = 1;
+                    }
+                    dist = Math.acos(dist);
+                    dist = dist * 180/Math.PI;
+                    dist = dist * 60 * 1.1515;
+                    if (unit==="K") { dist = dist * 1.609344; };
+                    if (unit==="N") { dist = dist * 0.8684; };
+                    return dist;
+                }
+            };
+            
+            window.onload = get_status;
+            document.getElementById("i_found_it_btn").onclick = function (){
+                        if(navigator.geolocation){
+                  navigator.geolocation.getCurrentPosition(function(position){
+                      var d=distance(current_lat, current_lon, position.coords.latitude, position.coords.longitude, 'K');
+                      if(d<5000){
+                          document.getElementById("questionModal").style.display="block";
+                      } else {
+                          alert("Вы еще не пришли...");
+                      }
+                  });
+              } else{
+                  alert("Увы, ваш браузер не поддерживает геолокации... Без этого игра невозможна. Обратитесь в поддержку, но особых надежд не питайте...");
+              }  
+            };
+            
+            document.getElementById("registration_button").onclick = function (){
+                var regStatus = registration(document.getElementById("registration_input").value, get_id());
+                
+                switch (regStatus) {
+                    case "UNAUTHORIZED":
+                        alert("Регистрация не удалась!");
+                        break;
+                    case "GAME_NOT_STARTED":
+                        alert("Игра еще не началась...");
+                        break;
+                    case "GAME_ENDED":
+                        alert("Игра уже закончилась...");
+                        break;
+                    case "OK":
+                        document.getElementById("registrationModal").style.display = "none";
+                        get_status();
+                        break;
+                    case "UNKNOWN":
+                    default:
+                        alert("Что-то пошло не так... Обратитесь в поддержку");
+                        break;
+                }
+            };
+            
+            function sendAnswer(answer){
+                var ajaxResponse = $.ajax({
+                    async: false,
+                    type: 'GET',
+                    headers: {},
+                    url: "https://svcolasupergood.ru:8443/api/v1/answer?deviceId=" + get_id() + "&answer=" + answer
+                });
+                
+                console.log(ajaxResponse);
+                
+                switch (ajaxResponse.status) {
+                    case 401:
+                        return "UNAUTHORIZED";
+                    case 425:
+                        return "GAME_NOT_STARTED";
+                    case 408:
+                        return "GAME_ENDED";
+                    case 200:
+                        switch (ajaxResponse.responseJSON.status) {
+                            case "CORRECT":
+                            case "INCORRECT":
+                            case "PENALTY":
+                                return ajaxResponse.responseJSON.status;
+                        }
+                    default:
+                        return "UNKNOWN";
+                }
+            }
+            
+            document.getElementById("answer_A_btn").onclick = function() {processAnswer('A');};
+            document.getElementById("answer_B_btn").onclick = function() {processAnswer('B');};
+            document.getElementById("answer_C_btn").onclick = function() {processAnswer('C');};
+            document.getElementById("answer_D_btn").onclick = function() {processAnswer('D');};
+            
+            
+            
+            function processAnswer(answer){
+                var result = sendAnswer(answer);
+                document.getElementById("questionModal").style.display="none";
+                
+                switch(result){
+                    case "CORRECT":
+                        alert("Это правильный ответ");
+                        break;
+                    case "INCORRECT":
+                        alert("Это неправильный ответ, вам назначен штрафной интервал в течении которого ваши ответы не будут приниматься");
+                        break;
+                    case "PENALTY":
+                        alert("В данный момент для вас действует штрафной период после неверного ответа на вопрос. Ответы не принимаются. Попробуйте позже");
+                        break;
+                    case "UNAUTHORIZED":
+                        alert("Вы не авторизованы!");
+                        break;
+                    case "GAME_NOT_STARTED":
+                        alert("Игра еще не начата. Попробуйте позже...");
+                        break;
+                    case "GAME_ENDED":
+                        alert("Игра окончена. Определен победитель");
+                        break;
+                    default :
+                        alert("Неизвестное состояние. Не до конца понятно, как вы этого добились");
+                }
+                get_status();
+            }
+
+        </script>
+
+    </body>
+</html>
