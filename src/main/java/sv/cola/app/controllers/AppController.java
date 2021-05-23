@@ -1,5 +1,6 @@
 package sv.cola.app.controllers;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -190,7 +191,7 @@ public class AppController {
 	private GameProperties getGameProperties() throws ResponseStatusException{
 		Optional<GameProperties> ogp = gamePropertiesRepository.findOne(EMPTY_GAME_PROPERTIES_EXAMPLE);
 		
-		if(ogp.isEmpty()) {
+		if(!ogp.isPresent()) {
 			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Game properties not set");
 		}
 		
@@ -324,10 +325,13 @@ public class AppController {
 		
 		PromoCode promoCodeTemplate = new PromoCode();
 		if(codesSubmissionsAttempt == null || codesSubmissionsAttempt.getBoatName() == null) {
+			
+			System.out.println("REGISTRATION\t"+codesSubmissionsAttempt.getBoatName()+"\tFAIL\tWRONG BOAT NAME");
 			return ResponseEntity.badRequest().body(CodeSubmissionResult.WRONG_BOAT_NAME);
 		}
 		promoCodeTemplate.setBoatName(codesSubmissionsAttempt.getBoatName().toUpperCase().trim());
 		if(promoCodeRepository.count(Example.of(promoCodeTemplate)) < 1) {
+			System.out.println("REGISTRATION\t"+codesSubmissionsAttempt.getBoatName()+"\tFAIL\tWRONG BOAT NAME");
 			return ResponseEntity.badRequest().body(CodeSubmissionResult.WRONG_BOAT_NAME);
 		};
 		
@@ -337,9 +341,11 @@ public class AppController {
 		if((codes = codesSubmissionsAttempt.getCodes()) !=null) {
 			for(String code: codes) {
 				if(!promoCodeRepository.existsById(code)) {
+					System.out.println("REGISTRATION\t"+codesSubmissionsAttempt.getBoatName()+"\tFAIL\tWRONG CODE\t"+Arrays.toString(codes));
 					return ResponseEntity.badRequest().body(CodeSubmissionResult.WRONG_CODE);
 				}
 				if(processedCodes.contains(code)) {
+					System.out.println("REGISTRATION\t"+codesSubmissionsAttempt.getBoatName()+"\tFAIL\tWRONG DUPLICATE CODE\t"+Arrays.toString(codes));
 					return ResponseEntity.badRequest().body(CodeSubmissionResult.DUPLICATE_CODE);
 				}
 				
@@ -349,9 +355,10 @@ public class AppController {
 		}
 		
 		if (getGameProperties().getPromoCodesNeeded() > i) {
+			System.out.println("REGISTRATION\t"+codesSubmissionsAttempt.getBoatName()+"\tFAIL\tNOT ENOUGH CODES\t"+Arrays.toString(codes));
 			return ResponseEntity.badRequest().body(CodeSubmissionResult.NOT_ENOUGH_CODES);
 		}
-		
+		System.out.println("REGISTRATION\t"+codesSubmissionsAttempt.getBoatName()+"\tSUCCESS\tSUCCESS\t"+Arrays.toString(codes));
 		return ResponseEntity.ok(CodeSubmissionResult.OK);
 	}
 		
