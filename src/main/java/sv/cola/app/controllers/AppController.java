@@ -1,5 +1,6 @@
 package sv.cola.app.controllers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -7,6 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
@@ -131,19 +133,55 @@ public class AppController {
 		play = playRepository.save(playFromDB);
 		
 		List<Question> questions = questionRepository.findAll();
+		
 		List<Spot> spots = spotRepository.findAll();
 		
-		System.out.println(questions.size());
+		List<Spot> farawaysSpots  = spots.stream().filter(f -> f.getSpotType().equals("F")).collect(Collectors.toList());
+		List<Spot> waterSpots  = spots.stream().filter(f -> f.getSpotType().equals("W")).collect(Collectors.toList());
+		List<Spot> regularSpots  = spots.stream().filter(f -> f.getSpotType().equals("N")).collect(Collectors.toList());
+		
+		Collections.shuffle(farawaysSpots);
+		Collections.shuffle(waterSpots);
+		Collections.shuffle(regularSpots);
 		
 		Collections.shuffle(questions);
-		Collections.shuffle(spots);
 		
-		for(int i = 0; i<play.getPointsPlanned(); i++) {
+		List<PlayPoint> lpp = new ArrayList<>(play.getPointsPlanned());
+		
+		int i = 0;
+		
+		if (i<play.getPointsPlanned()) {
 			PlayPoint pp = new PlayPoint();
 			pp.setNum(i);
 			pp.setPlayPtr(play.getId());
 			pp.setQuestionPtr(questions.get(i).getId());
-			pp.setPointPtr(spots.get(i).getId());
+			pp.setPointPtr(waterSpots.get(i).getId());
+			lpp.add(pp);
+			i++;
+		}
+		
+		if (i<play.getPointsPlanned()) {
+			PlayPoint pp = new PlayPoint();
+			pp.setNum(i);
+			pp.setPlayPtr(play.getId());
+			pp.setQuestionPtr(questions.get(i).getId());
+			pp.setPointPtr(farawaysSpots.get(i).getId());
+			lpp.add(pp);
+			i++;
+		}
+		
+		for(; i<play.getPointsPlanned(); i++) {
+			PlayPoint pp = new PlayPoint();
+			pp.setNum(i);
+			pp.setPlayPtr(play.getId());
+			pp.setQuestionPtr(questions.get(i).getId());
+			pp.setPointPtr(regularSpots.get(i).getId());
+			lpp.add(pp);
+		}
+		
+		Collections.shuffle(lpp);
+		
+		for(PlayPoint pp: lpp) {
 			playPointRepository.save(pp);
 		}
 		
@@ -340,7 +378,7 @@ public class AppController {
 		String[] codes;
 		if((codes = codesSubmissionsAttempt.getCodes()) !=null) {
 			for(String code: codes) {
-				if(!promoCodeRepository.existsById(code)) {
+				if(!promoCodeRepository.existsById(code.toUpperCase())) {
 					System.out.println("REGISTRATION\t"+codesSubmissionsAttempt.getBoatName()+"\tFAIL\tWRONG CODE\t"+Arrays.toString(codes));
 					return ResponseEntity.badRequest().body(CodeSubmissionResult.WRONG_CODE);
 				}
@@ -349,7 +387,7 @@ public class AppController {
 					return ResponseEntity.badRequest().body(CodeSubmissionResult.DUPLICATE_CODE);
 				}
 				
-				processedCodes.add(code);
+				processedCodes.add(code.toUpperCase());
 				i++;
 			}
 		}

@@ -39,6 +39,18 @@ public class Spot {
     @Column(name = "render_id", nullable = false)
 	private Integer renderId;
 
+    @Column(name = "spottype", nullable = false)
+	private String spotType;
+    
+
+	public String getSpotType() {
+		return spotType;
+	}
+
+	public void setSpotType(String spotType) {
+		this.spotType = spotType;
+	}
+
 	public Integer getRenderId() {
 		return renderId;
 	}
